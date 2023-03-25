@@ -5,8 +5,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-@FeignClient(name="msvc-usuarios", url="${msvc.usuarios.url}")
+// Solo el nombre del servicio
+@FeignClient(name="msvc-usuarios")
 public interface UsuarioClientRest {
 
     @GetMapping("/{id}")
