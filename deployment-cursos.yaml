@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: msvc-cursos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: msvc-cursos
+  template:
+    metadata:
+      labels:
+        app: msvc-cursos
+    spec:
+      containers:
+        - name: cursos
+          image: codigototal/cursos:latest
+          ports:
+            - containerPort: 8002
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: port
+                  name: msvc-cursos
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: db_host
+                  name: msvc-cursos
+            - name: DB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  key: database
+                  name: msvc-cursos
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: msvc-cursos
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: msvc-cursos
+            - name: USUARIOS_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: curso_url
+                  name: msvc-cursos
