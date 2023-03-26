@@ -9,6 +9,7 @@ data: # aqui van los parametros
 #  username: root
 #  password: root # yo  se que no este
   curso_url: msvc-cursos:8002
+
 ---
 apiVersion: v1
 kind: ConfigMap
