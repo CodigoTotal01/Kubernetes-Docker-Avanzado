@@ -9,7 +9,23 @@ data: # aqui van los parametros
 #  username: root
 #  password: root # yo  se que no este
   curso_url: msvc-cursos:8002
-
+  application.yaml: |-
+    config:
+      texto: Configurando ambiente por defecto
+    ---
+    spring:
+      config:
+        activate:
+          on-profile: dev
+    config:
+      texto: Configurando en ambiente de desarrollo
+    ---
+    spring:
+      config:
+        activate:
+          on-profile: prod
+    config:
+      texto: Configurando en ambiente de producccion
 ---
 apiVersion: v1
 kind: ConfigMap
