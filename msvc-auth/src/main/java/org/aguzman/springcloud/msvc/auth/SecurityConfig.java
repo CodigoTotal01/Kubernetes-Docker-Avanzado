@@ -66,6 +66,8 @@ public class SecurityConfig {
         return http.build();
     }
 
+
+    //detalles del usauriom nombre, password y el Role
     @Bean
     public UserDetailsService userDetailsService() {
         UserDetails userDetails = User.withDefaultPasswordEncoder()
@@ -80,17 +82,18 @@ public class SecurityConfig {
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("messaging-client")
-                .clientSecret("{noop}12345")
+                .clientId("usuarios-client")
+                .clientSecret("{noop}12345") //noop - indica que no esta incriptado, lo segundo es la contrasena a encriptar
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .redirectUri("http://127.0.0.1:8001/login/oauth2/code/messaging-client-oidc")
+                //indicar los ouertos que se conectaran a este servidor, con cubernetes apolkicacimos el load balancer
+                .redirectUri("http://127.0.0.1:8001/login/oauth2/code/msvc-usuarios-client")
                 .redirectUri("http://127.0.0.1:8001/authorized")
                 .scope(OidcScopes.OPENID)
-                .scope("message.read")
-                .scope("message.write")
+                .scope("read") //message - otorgado a roles
+                .scope("write")
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
                 .build();
 
