@@ -104,6 +104,13 @@ public class UsuarioController {
         return ResponseEntity.notFound().build();
     }
 
+    //Para cuando accede piola
+    @GetMapping("/authorized")
+    public Map<String, Object> authorized(@RequestParam(name = "code") String code){ // nos retorna en el request param un codigo
+        return Collections.singletonMap("code", code);
+    }
+
+
     @GetMapping("/usuarios-por-curso")
     public ResponseEntity<?> obtenerAlumnosPorCurso(@RequestParam List<Long> ids){
         return ResponseEntity.ok(service.listarPorIds(ids));

@@ -1,6 +1,12 @@
 spring:
   security:
+#  se nos retorna un codigo de aothorizacion por el metodo, de valla... autorizacion xd
+
     oauth2:
+      resourceserver:
+        jwt:
+          # colocar ruta del servidor de autorizacion
+          issuer-uri: http://127.0.0.1:9000
       client:
         registration:
 #          podemos registrar diferentes clientes
