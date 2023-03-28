@@ -2,6 +2,7 @@ package org.aguzman.springcloud.msvc.usuarios;
 
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,6 +18,12 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
+                //indicar que rutas estaran disponibles en nuestro programa
+                .antMatchers("/authorized").permitAll() // pa todos 👌
+                .antMatchers(HttpMethod.GET,"/", "/{id}").hasAnyAuthority("SCOPE_read", "SCOPE_write")
+                .antMatchers(HttpMethod.POST, "/").hasAnyAuthority("SCOPE_write")
+                .antMatchers(HttpMethod.PUT, "/{id}").hasAnyAuthority("SCOPE_write")
+                .antMatchers(HttpMethod.DELETE, "/{id}").hasAnyAuthority("SCOPE_write")
 
                 .anyRequest().authenticated()
                 .and()
@@ -26,7 +33,8 @@ public class SecurityConfig {
                 //ponen el nombre del servicio a registrar
                 .oauth2Login(oauthLogin -> oauthLogin.loginPage("/oauth2/authorization/msvc-usuarios-client"))
                 //se entiende que esata es la agina que msotrara al culminar de acceder
-                .oauth2Client(withDefaults()); // configuracion por defecto
+                .oauth2Client(withDefaults()) // configuracion por defecto
+                .oauth2ResourceServer().jwt(); //supongo que esto es lo que retornara
         return http.build();
     }
 
