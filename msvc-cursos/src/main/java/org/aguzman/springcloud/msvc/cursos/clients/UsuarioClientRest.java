@@ -15,6 +15,9 @@ public interface UsuarioClientRest {
     @PostMapping("/")
     Usuario crear(@RequestBody Usuario usuario);
 
-    @GetMapping("/usuarios-por-curso")
-    List<Usuario> obtenerAlumnosPorCurso(@RequestParam Iterable<Long> ids);
+
+
+
+    @GetMapping("/usuario-por-curso") // header es cabezera
+    List<Usuario> obtenerAlumnosPorCurso(@RequestParam Iterable<Long> ids, @RequestHeader(value = "Authorization", required = true) String token);
 }

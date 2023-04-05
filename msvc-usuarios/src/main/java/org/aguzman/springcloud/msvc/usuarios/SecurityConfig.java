@@ -31,9 +31,10 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 //ponen el nombre del servicio a registrar
-                .oauth2Login(oauthLogin -> oauthLogin.loginPage("/oauth2/authorization/msvc-usuarios-client"))
+                .oauth2Login(oauthLogin -> oauthLogin.loginPage("/oauth2/authorization/msvc-usuarios-client")).csrf().disable()
                 //se entiende que esata es la agina que msotrara al culminar de acceder
-                .oauth2Client(withDefaults()) // configuracion por defecto
+//                .oauth2Client(withDefaults()) // configuracion por defecto
+                .oauth2Client(withDefaults()).csrf().disable() //desactibamos este token de seguridad que nos daba el formulario
                 .oauth2ResourceServer().jwt(); //supongo que esto es lo que retornara
         return http.build();
     }

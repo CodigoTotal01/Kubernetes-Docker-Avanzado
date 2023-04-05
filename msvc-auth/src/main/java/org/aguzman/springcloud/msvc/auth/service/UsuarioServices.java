@@ -21,7 +21,7 @@ public class UsuarioServices implements UserDetailsService {
 
     //recuerda haber generado la condgiruacion
     @Autowired
-    private WebClient client;
+    private WebClient.Builder client;
 
     private Logger log = LoggerFactory.getLogger(UsuarioServices.class);
 
@@ -29,9 +29,11 @@ public class UsuarioServices implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         try{
-            Usuario usuario = client.get()
+            Usuario usuario = client
+                    .build()
+                    .get()
                     //se le pone el nombre de la propeidad d del microservicio a registrar
-                    .uri("http://msvc-usuarios", uri-> uri.queryParam("email", email).build())
+                    .uri("http://msvc-usuarios/login", uri-> uri.queryParam("email", email).build())
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve() //obtendremos un objeto reactivo
                     .bodyToMono(Usuario.class).block();
