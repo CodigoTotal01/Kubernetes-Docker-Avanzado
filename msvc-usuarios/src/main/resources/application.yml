@@ -15,7 +15,7 @@ spring:
             client-id: usuarios-client
             client-secret: 12345
             authorization-grant-type: authorization_code
-            redirect-uri: ${LB_USUARIOS_URI:http://127.0.0.1:8001/authorized} #recuerda, esto es un load vlancer asi que cambiara yu el otro sera una vaina que generaremos si pasa
+            redirect-uri: ${LB_USUARIOS_URI:http://127.0.0.1:8001}/authorized #recuerda, esto es un load vlancer asi que cambiara yu el otro sera una vaina que generaremos si pasa
             scope: read
             client-name: msvc-usuarios-client
         provider:

@@ -59,7 +59,11 @@
 		</dependency>
 
 <!--		josesito no esta xd -->
-
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+			<version>9.31</version>
+		</dependency>
 	</dependencies>
 	<!--maneja las dependencias de spring cloud -->
 	<dependencyManagement>

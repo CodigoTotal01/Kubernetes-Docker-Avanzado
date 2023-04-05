@@ -1,4 +1,5 @@
 package org.aguzman.springcloud.msvc.auth;
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
@@ -11,15 +12,19 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
@@ -34,6 +39,22 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 
 @Configuration
 public class SecurityConfig {
+
+
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+
+    @Bean
+    public static BCryptPasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
+
+
+    @Autowired
+    private Environment env;
 
     @Bean
     @Order(1)
@@ -67,30 +88,41 @@ public class SecurityConfig {
     }
 
 
+
+    //se elimina para la configuracion bcrypt
     //detalles del usauriom nombre, password y el Role
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails userDetails = User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("12345")
-                .roles("USER")
-                .build();
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        UserDetails userDetails = User.withDefaultPasswordEncoder()
+//                .username("admin")
+//                .password("12345")
+//                .roles("USER")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(userDetails);
+//    }
 
-        return new InMemoryUserDetailsManager(userDetails);
+
+
+    //Literalmente aqui es donde se loguea el usuario y se registra
+    @Autowired
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
-
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("usuarios-client")
-                .clientSecret("{noop}12345") //noop - indica que no esta incriptado, lo segundo es la contrasena a encriptar
+                // con el password encrypter ya no es ncesario
+//                .clientSecret("{noop}12345") //noop - indica que no esta incriptado, lo segundo es la contrasena a encriptar
+                .clientSecret(passwordEncoder().encode("12345"))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 //indicar los ouertos que se conectaran a este servidor, con cubernetes apolkicacimos el load balancer
-                .redirectUri("http://127.0.0.1:8001/login/oauth2/code/msvc-usuarios-client")
-                .redirectUri("http://127.0.0.1:8001/authorized")
+                .redirectUri(env.getProperty("LB_USUARIOS_URI") + "/login/oauth2/code/msvc-usuarios-client")
+                .redirectUri(env.getProperty("LB_USUARIOS_URI") + "/authorized")
                 .scope(OidcScopes.OPENID)
                 .scope("read") //message - otorgado a roles
                 .scope("write")
@@ -119,8 +151,7 @@ public class SecurityConfig {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
             keyPairGenerator.initialize(2048);
             keyPair = keyPairGenerator.generateKeyPair();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new IllegalStateException(ex);
         }
         return keyPair;

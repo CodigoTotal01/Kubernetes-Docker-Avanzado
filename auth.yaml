@@ -1,0 +1,42 @@
+# recirda usar las variables de ambiente que usa el servicio :D
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: msvc-auth
+spec:
+  replicas: 1 #las replicas son los pods :D
+  selector:
+    matchLabels:
+      role: msvc-auth
+  template:
+    metadata:
+      #hola, soy una etiqueta
+      labels:
+        role: msvc-auth
+    spec:
+      containers:
+        - name: msvc-auth
+          image: codigototal/auth:latest
+          ports:
+            - containerPort: 9000
+          env:
+            - name: LB_USUARIOS_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: lb_usuarios_uri
+                  name: msvc-usuarios
+---
+apiVersion: v1
+kind: Service
+metadata:
+#  tiene que tener el mismo nombre del deployment y del servicio (curso), asi se registrara en el client discovery
+  name: msvc-auth
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8090 #puerto del servicio
+      targetPort: 8090 #peurto del servicio (deployment)
+      #seleccionar los pods, mediante eqiquetas , ten cuiado con la cantidad de etuiquetas
+  selector:
+    role: msvc-auth
